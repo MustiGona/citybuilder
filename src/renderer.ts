@@ -9,7 +9,6 @@ type Float = number;
 export class CRenderer extends WebGL.App.SimpleAppRenderer<CEngine>{
   colour_shader: WebGL.Shader.MVPColourProgram;
 
-  c1: Web
   constructor(w: Int32, h: Int32){
     super(w, h);
     this.colour_shader = new WebGL.Shader.MVPColourProgram();
