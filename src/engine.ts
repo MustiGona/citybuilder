@@ -7,18 +7,22 @@ import Point2D = Geom.Base.Point2D;
 type Int32 = number;
 type Float = number;
 
-class City{
-	x: Float;
-	y: Float;
+class City extends Geom.Circle.Circle{
+	//x: Float;
+	//y: Float;
+	static current_id = 0;
+	id: Int32;
+
 	constructor(x: Float, y: Float){
-		this.x = x;
-		this.y = y;
+		super(x, y, 0.3);
+		this.id = City.current_id;
+		City.current_id++;
 	}
 	getPoint(): Point2D{
-		return new Point2D(this.x, this.y);
+		return this.centre;
 	}
-	isInside(){
-		//todo
+	isInside(pt: Point2D): boolean{
+		return this.collisionPoint(pt);
 	}
 }
 
@@ -28,6 +32,8 @@ class MainScreen extends InterfaceElement.InterfaceElement{
 	pixels_per_unit: Float;
 	game_mouse: Point2D | undefined;
 
+	dragging: boolean;
+
 
 	constructor(x: Float, y: Float, width: Float, height: Float){
 		super(x, y, width, height);
@@ -36,7 +42,13 @@ class MainScreen extends InterfaceElement.InterfaceElement{
 		const bot = 0;
 		this.game_rect_bound = new InterfaceElement.Rect(left, left+this.getGameRectWidth(), 
 		bot, bot+this.getGameRectHeight());
+		this.game_mouse = undefined;
+		this.dragging = false;
 
+	}
+
+	private hasMouseOver(): boolean{
+		return this.game_mouse != undefined;
 	}
 
 	getGameRectWidth(){
@@ -46,13 +58,21 @@ class MainScreen extends InterfaceElement.InterfaceElement{
 		return this.height/this.pixels_per_unit;
 	}
 	onMouseMove(global_mouse: Point2D){
+		const old_game_mouse = this.game_mouse != undefined ? this.game_mouse.copy() : undefined;
 		this.updateGameMouse(global_mouse);
+		if(old_game_mouse != undefined && this.game_mouse != undefined){
+			this.dragScreen(old_game_mouse, this.game_mouse);
+		}
+
 	}
 	onMouseDown(){
 		console.log(this.game_mouse);
+		if(this.hasMouseOver()){
+			this.dragging = true;
+		}
 	}
 	onMouseUp(){
-
+		this.dragging = false;
 	}
 
 	gamePointToGlobalPoint(point: Point2D): Point2D{
@@ -62,12 +82,20 @@ class MainScreen extends InterfaceElement.InterfaceElement{
 	}
 
 	private updateGameMouse(global_mouse: Point2D){
-		// todo: update in webglmusti 0.8
 		if(this.isInside(global_mouse)){
+			//to test
 			const relative_mouse = new Point2D(global_mouse.x-this.x, global_mouse.y-this.y);
-			this.game_mouse = new Point2D(relative_mouse.x/this.pixels_per_unit, relative_mouse.y/this.pixels_per_unit);
+			this.game_mouse = new Point2D(this.game_rect_bound.left+relative_mouse.x/this.pixels_per_unit, this.game_rect_bound.bot+relative_mouse.y/this.pixels_per_unit);
 		}else{
 			this.game_mouse = undefined;
+		}
+	}
+	private dragScreen(old_game_mouse: Point2D, new_game_mouse: Point2D){
+		if(this.dragging){
+			const dx = new_game_mouse.x - old_game_mouse.x;
+			const dy = new_game_mouse.y - old_game_mouse.y;
+			this.game_rect_bound.move(-dx, -dy);
+			console.log(this.game_rect_bound.bot);
 		}
 	}
 }
@@ -77,6 +105,7 @@ export class CEngine extends WebGL.App.BaseEngine{
 	global_mouse: Geom.Base.Point2D;
 
 	cities: City[];
+	hovered_city: Int32 | undefined;
 
 	constructor(){
 		super();
@@ -92,6 +121,16 @@ export class CEngine extends WebGL.App.BaseEngine{
 		this.global_mouse.x = ev.clientX;
 		this.global_mouse.y = ev.clientY;
 		this.main_screen.onMouseMove(this.global_mouse);
+
+		const game_mouse = this.main_screen.game_mouse;
+
+		this.hovered_city = undefined;
+		for(let i = 0; i < this.cities.length; i++){
+			const city = this.cities[i];
+			if(game_mouse != undefined && city.isInside(game_mouse)){
+				this.hovered_city = city.id;
+			}
+		}
 	}
 	protected handleMouseDown(ev: MouseEvent): void {
 		this.main_screen.onMouseDown();

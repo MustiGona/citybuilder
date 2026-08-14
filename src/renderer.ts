@@ -12,6 +12,7 @@ export class CRenderer extends WebGL.App.SimpleAppRenderer<CEngine>{
   colour_shader: WebGL.Shader.MVPColourProgram;
   circle_shader: WebGL.Shader.MVPCircleOnlyProgram;
 
+
   constructor(w: Int32, h: Int32){
     super(w, h);
 
@@ -45,9 +46,6 @@ export class CRenderer extends WebGL.App.SimpleAppRenderer<CEngine>{
   }
 
   drawCities(engine: CEngine){
-    const city_radius = 1;
-    const cp = city_radius*engine.main_screen.pixels_per_unit;
-    const hcp = cp*0.5;
     this.circle_shader.use();
     this.circle_shader.setCircleColourFromColourRGB(WebGL.Colour.ColourUtils.white());
     this.circle_shader.setRadius(0.5);
@@ -57,14 +55,21 @@ export class CRenderer extends WebGL.App.SimpleAppRenderer<CEngine>{
     // can use interface element after update
 
     // can use webgl.blend after update
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    WebGL.WebGL.enableBlend();
     for(const city of engine.cities){
+      const city_diameter = city.radius+city.radius;
+      const cp = city_diameter*engine.main_screen.pixels_per_unit;
+      const hcp = cp*0.5;
       const centre = engine.main_screen.gamePointToGlobalPoint(city.getPoint());
       const model = WebGL.WebGL.rectangleModel(centre.x-hcp, centre.y-hcp, cp, cp);
+      if(city.id == engine.hovered_city){
+        this.circle_shader.setCircleColourFromColourRGB(WebGL.Colour.ColourUtils.red());
+      }else{
+        this.circle_shader.setCircleColourFromColourRGB(WebGL.Colour.ColourUtils.white());
+      }
       this.circle_shader.setMvp(this.orthographic.multiplyCopy(model));
       Shapes.Quad.draw();
     }
-    gl.disable(gl.BLEND);
+    WebGL.WebGL.disableBlend();
   }
 }
