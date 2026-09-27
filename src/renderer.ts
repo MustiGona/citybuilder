@@ -11,8 +11,9 @@ type Float = number;
 export class CRenderer extends WebGL.App.SimpleAppRenderer<CEngine>{
   colour_shader: WebGL.Shader.MVPColourProgram;
   circle_shader: WebGL.Shader.MVPCircleOnlyProgram;
+  texture_shader: WebGL.Shader.MVPTextureProgram;
 
-
+  textures: WebGL.Texture.GenericTextureCollection;
   constructor(w: Int32, h: Int32){
     super(w, h);
 
@@ -22,27 +23,35 @@ export class CRenderer extends WebGL.App.SimpleAppRenderer<CEngine>{
 
     this.colour_shader = new WebGL.Shader.MVPColourProgram();
     this.circle_shader = new WebGL.Shader.MVPCircleOnlyProgram();
+    this.texture_shader = new WebGL.Shader.MVPTextureProgram();
+
+    this.textures = new WebGL.Texture.GenericTextureCollection();
+
+    this.textures.addFromUrl("grass", "grass.png");
+    this.textures.addFromUrl("clay", "clay.png");
+
+    this.textures.load();
+    
   }
   render(e: CEngine){
-    WebGL.WebGL.drawColourRect(
-      this.orthographic, this.colour_shader, 
-      10, 10, 40, 50, WebGL.Colour.ColourUtils.red()
-    );
 
     e.main_screen.drawBackground(this.orthographic, this.colour_shader, Colour.ColourUtils.blue());
-    //e.main_screen.enableScissors();
+    e.main_interface.draw(this.orthographic, this.colour_shader, this.text_drawer);
+    //e.main_interface.drawBackground(this.orthographic, this.colour_shader, Colour.ColourUtils.grey());
     //use mainscreen scissors after update
     WebGL.WebGL.enableScissor(e.main_screen.x, e.main_screen.y, e.main_screen.width, e.main_screen.height);
     this.drawCities(e);
 
     WebGL.WebGL.disableScissor();
-    //e.main_screen.disableScissors();
 
 
     if(e.main_screen.game_mouse != undefined){
       const s = `${e.main_screen.game_mouse.x.toFixed(2)}, ${e.main_screen.game_mouse.y.toFixed(2)}`;
       this.text_drawer.drawText(this.orthographic, 400, 40, s, 12);
     }
+
+    e.city_screen.draw(this.orthographic, this.colour_shader, this.texture_shader, this.textures);
+    
   }
 
   drawCities(engine: CEngine){
