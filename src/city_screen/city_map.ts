@@ -1,5 +1,6 @@
 import { WebGL } from "webglmusti";
 import * as City from "./../city/city";
+import * as Resources from  "./resources";
 
 import InterfaceElement = WebGL.Interface.InterfaceElement.InterfaceElement;
 import TransformationMatrix = WebGL.Matrix.TransformationMatrix3x3;
@@ -63,6 +64,8 @@ export class CityMap{
 
     this.close = new InterfaceElement(10, 10, 30, 30);
     this.is_open = false;
+
+    CityMapGen.testGen();
   }
   loadCity(city: City.City){
     this.is_open = true;
@@ -100,3 +103,18 @@ export class CityMap{
 }
 
 //todo test procedral gen
+
+//choose spot on map away from edges, 
+// choose 2 resources 
+
+class CityMapGen{
+  //
+  static testGen(){
+    const resources = Resources.ResourceBank.getRandomResources(2);
+    console.log(resources);
+
+    const circle_size = 3;
+
+    
+  }
+}

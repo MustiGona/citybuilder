@@ -1,11 +1,11 @@
-
+import { WebGL } from "webglmusti";
 type Int32 = number;
 //stone, clay, wood, 
 
 const BuildingResourceEnum = {
-  stone: 0,
-  clay: 1,
-  wood: 2
+  Stone: 0,
+  Clay: 1,
+  Wood: 2
 } as const;
 
 export type BuildingResource = (typeof BuildingResourceEnum)[keyof typeof BuildingResourceEnum];
@@ -19,5 +19,12 @@ export class ResourceBank{
       this.resources.set(v, 0);
     }
     this.limit = l;
+  }
+
+  static getRandomResources(n: Int32=1): BuildingResource[]{
+    //const res = [];
+    const num_resources = Object.keys(BuildingResourceEnum).length;
+    const rand = WebGL.Utils.Array.random0ToN(num_resources);
+    return rand.slice(0, n) as BuildingResource[];
   }
 }

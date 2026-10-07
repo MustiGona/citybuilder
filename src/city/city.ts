@@ -34,3 +34,4 @@ export class City extends Geometry.Circle.Circle{
     return this.collisionPoint(pt);
   }
 }
+
