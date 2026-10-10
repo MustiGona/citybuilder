@@ -9,6 +9,7 @@ import Point2D = WebGL.Geometry.Base.Point2D;
 import Colour = WebGL.Colour;
 
 type Int32 = number;
+type Float = number;
 
 class StatInterface{
 
@@ -16,6 +17,16 @@ class StatInterface{
 
 class CityTile{
   //todo
+  resource_concentration: Resources.ResourceTileConcentration;
+  texture_representation: string;
+
+  constructor(){
+    this.resource_concentration = new Resources.ResourceTileConcentration();
+    this.texture_representation = this.resource_concentration.getTileTextureString();
+  }
+  getTexture(): string{
+    return this.texture_representation;
+  }
 }
 
 class CityGrid extends WebGL.Grid.Generic.GenericGrid2DInterface<WebGL.Grid.Generic.GenericGrid2D<Int32>>{
@@ -65,7 +76,7 @@ export class CityMap{
     this.close = new InterfaceElement(10, 10, 30, 30);
     this.is_open = false;
 
-    CityMapGen.testGen();
+    CityMapGen.testGen(this.grid);
   }
   loadCity(city: City.City){
     this.is_open = true;
@@ -104,17 +115,25 @@ export class CityMap{
 
 //todo test procedral gen
 
-//choose spot on map away from edges, 
+// choose spot on map away from edges, 
 // choose 2 resources 
 
 class CityMapGen{
   //
-  static testGen(){
+  static testGen(grid: CityGrid){
     const resources = Resources.ResourceBank.getRandomResources(2);
     console.log(resources);
 
-    const circle_size = 3;
+    //const center
 
+    const width = grid.grid.getWidth();
+    const height = grid.grid.getHeight();
+    const circle_size = 3;
+    //pick point in rectangle (center of map)
+    const center_grid_rect = new WebGL.Grid.Algorithm.GridRectArea(circle_size, circle_size, 
+      width-(circle_size+circle_size), height-(circle_size+circle_size));
+
+    const random_coord = center_grid_rect.randomCoordinate();
     
   }
 }
