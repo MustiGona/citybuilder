@@ -55,7 +55,7 @@ class MainScreen extends InterfaceElement.InterfaceElement{
 	dragging: boolean;
 	drag_point: Point2D | undefined;
 
-	city_screen: CityMap.CityMap;
+	//city_screen: CityMap.CityMap;
 
 
 	constructor(x: Float, y: Float, width: Float, height: Float){
@@ -70,7 +70,7 @@ class MainScreen extends InterfaceElement.InterfaceElement{
 		this.game_mouse = undefined;
 		this.dragging = false;
 
-		this.city_screen = new CityMap.CityMap();
+		//this.city_screen = new CityMap.CityMap();
 	}
 
 	private hasMouseOver(): boolean{
@@ -194,6 +194,14 @@ export class CEngine extends WebGL.App.BaseEngine{
 	nextTurn(){
 		console.log("running next turn");
 		//todo
+	}
+
+	protected handleKeyDown(ev: KeyboardEvent): void {
+		switch(ev.key){
+			case "q":
+				console.log(this.city_screen.grid);
+				break;
+		}
 	}
 
 	protected handleMouseMove(ev: MouseEvent): void {

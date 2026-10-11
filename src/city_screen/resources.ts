@@ -47,6 +47,7 @@ export class ResourceTileConcentration{
     if(val < 0.2){
       return "grass";
     }
+    console.log(br);
     return ResourceBank.resourceToString(br);
   }
 }

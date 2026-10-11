@@ -29,6 +29,9 @@ export class CRenderer extends WebGL.App.SimpleAppRenderer<CEngine>{
 
     this.textures.addFromUrl("grass", "grass.png");
     this.textures.addFromUrl("clay", "clay.png");
+    this.textures.addFromUrl("wood", "wood.png");
+    this.textures.addFromUrl("stone", "stone.png");
+    this.textures.addFromUrl("building", "building.png");
 
     this.textures.load();
     
